@@ -1,0 +1,7 @@
+//This is the main script for the Game Repository. You shouldn't need to edit anything in here!
+login anonymous
+//START GAME LIST
+//END
+
+//STOP EDITING
+quit
