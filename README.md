@@ -5,6 +5,7 @@ Steam Game Repository SGR is a Python based tool that helps people maintain a re
 Steam Game Repository (SGR) README !!DON'T EDIT!!
 
 Setting up:
+
 	Setting up SGR is pretty easy. Everything you need should be in the downloaded .zip file:
 		Pip Install Script (get-pip.py)
 		SteamCMD (steamcmd.exe)
