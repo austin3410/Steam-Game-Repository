@@ -77,72 +77,55 @@ def steam_search(game_name, target):
                       " Game Link: {}".format(name, id, oglink))
                 return game
 
+def file_check():
+    file_check.stage = {"main_script.txt": 0, "settings.pickle": 0}
+    try:
+        with open("main_script.txt", "r") as file:
+            test_ms = file.read()
+        file_check.stage["main_script.txt"] = 1
+    except:
+        print("main_script.txt not found...")
+        time.sleep(.5)
+    try:
+        with open("settings//settings.pickle", "rb") as file:
+            test_set = pickle.load(file)
+        file_check.stage["settings.pickle"] = 1
+    except:
+        print("settings.pickle not found...")
+        time.sleep(.5)
+    return file_check.stage
+
 banner = ("=========================\n"
                "= Steam Game Repository =\n"
                "=========================")
 
 # First time setup section
-try:
-    with open("main_script.txt", "r") as file:
-        test_main_script = file.read()
-    with open("settings//settings.pickle", "rb") as file:
-        settings = pickle.load(file)
-        stage = 1
-except:
-    try:
-        with open("settings//games.pickle", "rb") as file:
-            games = pickle.load(file)
-        print("1 or more important file cannot be found!\n"
-              "However, your game data may be able to be recovered!\n"
-              "In order to recover your game data, you will need to\n"
-              "go through part of the initial setup process!\n"
-              "You will need to know the following:\n"
-              "1. Where your games (if any) are installed! This would've been your ROOT PATH!\n"
-              "2. Steam username!\n"
-              "Would you like to attempt a restore on your game data?")
-        gr = input("Y/N: ")
-        if gr.upper() == "Y":
-            stage2 = 1
-        elif gr.upper() == "N":
-            stage2 = 0
-        else:
-            print("That wasn't a Y or N so I'm assuming you want to attempt a restore.")
-            stage2 = 1
-            input(" ")
-        stage = 0
-    except:
-        print(banner)
-        print("1 or more critical files not found...\n"
-              "Starting first time setup...")
-        time.sleep(1)
-        print(".")
-        time.sleep(1)
-        print(".")
-        time.sleep(1)
-        stage = 0
-        stage2 = 0
-        os.system("cls")
-
-if stage == 0:
+# Crit File Check
+stage = file_check()
+if stage["main_script.txt"] == 0 and stage["settings.pickle"] == 0:
+    os.system("cls")
+    print(banner)
+    print("Starting first time setup...")
+    time.sleep(1)
+    os.system("cls")
+    print(banner)
+    print("!!BEFORE PROCEEDING!!\n"
+          "PLEASE START STEAM CMD AND PERFORM THE FOLLOWING COMMANDS!\n"
+          "================\n"
+          "login (YOUR STEAM USERNAME)\n"
+          "     (IT WILL THEN ASK FOR YOUR PASSWORD & 2FA IF APPLICABLE)\n"
+          "quit\n"
+          "================\n"
+          "THIS IS TO ENSURE PROPER FUNCTIONALITY!")
+    input("PRESS ENTER WHEN THE ABOVE IS COMPLETE: ")
     x = "N"
     while x.upper() == "N":
         os.system("cls")
         print(banner)
-        print("!!BEFORE PROCEEDING!!\n"
-              "PLEASE START STEAM CMD AND PERFORM THE FOLLOWNG COMMANDS!\n"
-              "================\n"
-              "login (YOUR STEAM USERNAME)\n"
-              "     (IT WILL THEN ASK FOR YOUR PASSWORD & 2FA IF APPLICABLE)\n"
-              "quit\n"
-              "================\n"
-              "THIS IS TO ENSURE PROPER FUNCTIONALITY!")
-        input("PRESS ENTER WHEN THE ABOVE IS COMPLETE: ")
-        os.system("cls")
-        print(banner)
         print("Where would you like the ROOT of the Game Repository to be?\n"
-                           "Example: 'G:\Steam'\n"
-                           "The above example will cause indivisual game folders to be \n"
-                           "generated inside the Steam folder.")
+              "Example: 'G:\Steam'\n"
+              "The above example will cause individual game folders to be \n"
+              "generated inside the Steam folder.")
         master_dir = input("Path without 's: ")
         try:
             temp_master_dir = master_dir.replace("\\", "//")
@@ -173,30 +156,112 @@ if stage == 0:
                 main_script = default_script.replace("anonymous", username)
             with open("main_script.txt", "w") as file:
                 file.write(main_script)
-            if stage2 == 0:
-                edit_settings(master_dir, username, "write")
-                os.system("cls")
-                print(banner)
-                input("Initial setup is complete...\n"
-                      "Restarting Steam Game Repository for your changes to take effect!")
-                os.system("python GameRepo.py")
-                quit()
-            else:
-                edit_settings(master_dir, username, "write")
-                os.system("cls")
-                print(banner)
-                input("Game data recovery is complete...\n"
-                      "Restarting Steam Game Repository for your changes to take effect!")
-                input("MAKE SURE YOU PERFORM THE FOLLOWING STEPS AFTER RESTART!!!\n"
-                      "1. Go to Settings(5)!\n"
-                      "2. Recover your Main Script(3)!\n"
-                      "Once you perform the above steps, your Steam Game Repository should be back to normal!")
-                os.system("python GameRepo.py")
-                quit()
+            edit_settings(master_dir, username, "write")
+            os.system("cls")
+            print(banner)
+            print("Initial setup is complete...\n"
+                  "Restarting Steam Game Repository for your changes to take effect!")
+            time.sleep(2)
+            os.system("python GameRepo.py")
+            quit()
 
+elif stage["main_script.txt"] == 0 and stage["settings.pickle"] == 1:
+    os.system("cls")
+    print(banner)
+    print("Your main_script.txt file is missing or unreadable...\n"
+          "SGR will now attempt and automatic recovery.\n")
+    input("CONTINUE AFTER YOU'VE READ THE ABOVE!!")
+    os.system("cls")
+    print(banner)
+    print("MAIN SCRIPT REBUILD IN PROGRESS...")
+    settings = edit_settings(None, None, "read")
+    with open("settings//default_script.txt", "r") as file:
+        default_script = file.read()
+    main_script = default_script.replace("anonymous", settings["username"])
+    try:
+        with open("settings//games.pickle", "rb") as file:
+            games = pickle.load(file)
+        games = games_add(None, None, "read")
+        for game in games:
+            main_script = main_script.replace("//END", '\n'
+                                                       '\n'
+                                                       '//{}\n'
+                                                       'force_install_dir "{}\{}"\n'
+                                                       'app_update {} validate\n'
+                                                       '//END'.format(game, settings["master_dir"], game, games[game]))
+    except:
+        pass
+    with open("main_script.txt", "w") as file:
+        file.write(main_script)
+    print("REBUILD COMPLETE!")
+    time.sleep(1)
+    os.system("cls")
+    print(banner)
+    print("Restarting Steam Game Repository for your changes to take effect!")
+    time.sleep(2)
+    os.system("python GameRepo.py")
+    quit()
+
+elif stage["main_script.txt"] == 1 and stage["settings.pickle"] == 0:
+    os.system("cls")
+    print(banner)
+    print("Your settings.pickle file is missing or unreadable...\n"
+          "You will have to go through part of the initial setup\n"
+          "once again in order to fix the problem.\n")
+    input("CONTINUE AFTER YOU'VE READ THE ABOVE!!")
+    x = "N"
+    while x.upper() == "N":
+        os.system("cls")
+        print(banner)
+        print("Where is the ROOT of your Game Repository?\n"
+              "Example: 'G:\Steam'\n"
+              "The above example will cause individual game folders to be \n"
+              "generated inside the Steam folder.")
+        master_dir = input("Path without 's: ")
+        try:
+            temp_master_dir = master_dir.replace("\\", "//")
+            with open("{}//test.txt".format(temp_master_dir), "w") as file:
+                test = "test"
+                file.write(test)
+            os.system("del /Q {}\\test.txt".format(master_dir))
+        except:
+            print("This path doesn't currently exist.\n"
+                  "I will go ahead and create it for you...")
+            os.system("mkdir {}".format(master_dir))
+            input("Path has been created!")
+        os.system("cls")
+        print(banner)
+        print("Ok, now what is your Steam username? This is the name you use to login to Steam.")
+        username = input("Username: ")
+        os.system("cls")
+        print(banner)
+        print("Please verify that both the path and username are correct.\n"
+              "Path: {}\n"
+              "Username: {}".format(master_dir, username))
+        y = input("Y/N: ")
+        if y.upper() == "N":
+            x = "N"
+        elif y.upper() == "Y":
+            with open("settings//default_script.txt", "r") as file:
+                default_script = file.read()
+                main_script = default_script.replace("anonymous", username)
+            edit_settings(master_dir, username, "write")
+            os.system("cls")
+            print(banner)
+            print("Settings recovery is complete...\n"
+                  "Restarting Steam Game Repository for your changes to take effect!")
+            time.sleep(2)
+            os.system("python GameRepo.py")
+            quit()
+
+
+
+"""for file in stage:
+    if stage[file] == 0:
+        if file == "main_script.txt":"""
 
 # Main Menu
-elif stage == 1:
+if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
     all_settings = edit_settings(master_dir=None, username=None, op="read")
     master_dir = all_settings["master_dir"]
     x = "1"
@@ -259,7 +324,8 @@ elif stage == 1:
                     print(banner)
                     print("The following game was found:")
                     rgame = steam_search(game_name, counter)
-                    print("\nIs the game listed above? It is recommended to take a sec and verify\nthat the correct game"
+                    print("\nIs the game listed above? It is recommended to take a sec and verify\nthat the correct "
+                          "game"
                           " was found by visiting the link above.")
                     counter += 1
                     a = input("Y/N: ")
@@ -332,7 +398,8 @@ elif stage == 1:
                                                           '\n'
                                                           '//{}\n'
                                                           'force_install_dir "{}\{}"\n'
-                                                          'app_update {} validate\n'.format(game_name, master_dir, game_name, game_id), "")
+                                                          'app_update {} validate\n'.format(game_name, master_dir,
+                                                                                            game_name, game_id), "")
                         with open("main_script.txt", "w") as file:
                             file.write(main_script)
                         os.system("cls")
