@@ -254,12 +254,6 @@ elif stage["main_script.txt"] == 1 and stage["settings.pickle"] == 0:
             os.system("python GameRepo.py")
             quit()
 
-
-
-"""for file in stage:
-    if stage[file] == 0:
-        if file == "main_script.txt":"""
-
 # Main Menu
 if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
     all_settings = edit_settings(master_dir=None, username=None, op="read")
