@@ -96,7 +96,7 @@ def file_check():
     return file_check.stage
 
 banner = ("=========================\n"
-               "= Steam Game Repository =\n"
+               "= Steam Game Repository =\n"    
                "=========================")
 
 # First time setup section
@@ -461,7 +461,8 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                   "~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
                   "1. Change Steam Games ROOT PATH\n"
                   "2. Change Steam Username\n"
-                  "3. Recover Main Script")
+                  "3. Recover Main Script\n"
+                  "4. About SGR")
             z = input(": ")
             if z == "1":
                 os.system("cls")
@@ -539,3 +540,12 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                     input(" ")
                 elif a.upper() == "N":
                     pass
+            elif z == "4":
+                os.system("cls")
+                print(banner)
+                print("Thanks for using Steam Game Repository!\n"
+                      "Created by austin3410\n"
+                      "Current Version: 1.0.0\n"
+                      "Check for new version:\n"
+                      "https://github.com/austin3410/Steam-Game-Repository")
+                input(" ")
