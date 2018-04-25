@@ -68,7 +68,7 @@ def steam_search(game_name, target):
                 oglink = link
                 link = link[33:len(link)]
                 id = find_between(link, "/", "/")
-                name = find_between(link[1:len(link)], "/", "/")
+                name = find_between(link[2:len(link)], "/", "/")
                 name = name.replace("_", " ")
                 game = {"game_name": str(name), "game_id": str(id), "game_link": str(oglink)}
                 print("\n"
