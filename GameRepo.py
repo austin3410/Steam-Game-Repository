@@ -3,6 +3,7 @@ import pickle
 import time
 import requests
 from bs4 import BeautifulSoup
+import fnmatch
 
 # Function Area
 def edit_settings(master_dir, username, op):
@@ -95,9 +96,13 @@ def file_check():
         time.sleep(.5)
     return file_check.stage
 
+# Global Variables
+
 banner = ("=========================\n"
                "= Steam Game Repository =\n"    
                "=========================")
+
+version = "V1.0.2"
 
 # First time setup section
 # Crit File Check
@@ -545,7 +550,28 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                 print(banner)
                 print("Thanks for using Steam Game Repository!\n"
                       "Created by austin3410\n"
-                      "Current Version: 1.0.0\n"
-                      "Check for new version:\n"
-                      "https://github.com/austin3410/Steam-Game-Repository")
+                      "Current Version: {}\n"
+                      "\n"
+                      "1. Check for new version:\n".format(version))
+                x = input(": ")
+                if x == "1":
+                    os.system("cls")
+                    print(banner)
+                    url = "https://github.com/austin3410/Steam-Game-Repository/releases/latest"
+                    r = requests.get(url)
+                    data = r.text
+                    soup = BeautifulSoup(data, "html.parser")
+                    span = soup.find_all("span", {"class": "css-truncate-target"})
+                    for thing in span:
+                        filtered = fnmatch.filter(thing, "V?.?.?")
+                        new_version = filtered[0]
+                        if version == new_version:
+                            print("You have the most up to date version!")
+                        else:
+                            print("There is a newer version available!\n"
+                                  "Your Version: {}\n"
+                                  "Current Version: {}\n"
+                                  "Go to:\n"
+                                  "https://github.com/austin3410/Steam-Game-Repository/releases/latest\n"
+                                  "To download it.".format(version, new_version))
                 input(" ")
