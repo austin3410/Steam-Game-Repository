@@ -137,7 +137,7 @@ banner = ("=========================\n"
                "= Steam Game Repository =\n"    
                "=========================")
 
-version = "V1.0.2"
+version = "V1.1.0"
 
 # First time setup section
 # Crit File Check
