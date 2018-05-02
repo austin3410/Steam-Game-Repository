@@ -25,6 +25,41 @@ def edit_settings(master_dir, username, op):
         except:
             return "SETTINGS NOT FOUND"
 
+def toggle_val():
+    with open("settings//settings.pickle", "rb") as file:
+        settings = pickle.load(file)
+    with open("main_script.txt", "r") as file:
+        main_script = file.read()
+    try:
+        if settings["validate"] == "True":
+            settings["validate"] = "False"
+            while True:
+                if "validate" in main_script:
+                    main_script = main_script.replace("validate", "")
+                else:
+                    break
+        elif settings["validate"] == "False":
+            settings["validate"] = "True"
+            main_script = main_script.splitlines()
+            counter = 0
+            for line in main_script:
+                if "app_update" in line:
+                    main_script[counter] = line + "validate"
+                counter += 1
+            main_script = "\n".join(main_script)
+        with open("settings//settings.pickle", "wb") as file:
+            pickle.dump(settings, file)
+        with open("main_script.txt", "w") as file:
+            file.write(main_script)
+        return "DONE"
+    except:
+        val = {"validate": "True"}
+        new_dic = {**settings, **val}
+        with open("settings//settings.pickle", "wb") as file:
+            pickle.dump(new_dic, file)
+        return "RUN AGAIN"
+
+
 def games_add(game_name, game_id, op):
     if op == "write":
         try:
@@ -467,7 +502,8 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                   "1. Change Steam Games ROOT PATH\n"
                   "2. Change Steam Username\n"
                   "3. Recover Main Script\n"
-                  "4. About SGR")
+                  "4. Toggle Game Validation\n"
+                  "5. About SGR")
             z = input(": ")
             if z == "1":
                 os.system("cls")
@@ -545,7 +581,7 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                     input(" ")
                 elif a.upper() == "N":
                     pass
-            elif z == "4":
+            elif z == "5":
                 os.system("cls")
                 print(banner)
                 print("Thanks for using Steam Game Repository!\n"
@@ -575,3 +611,28 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                                   "https://github.com/austin3410/Steam-Game-Repository/releases/latest\n"
                                   "To download it.".format(version, new_version))
                 input(" ")
+            elif z == "4":
+                os.system("cls")
+                print(banner)
+                with open("settings//settings.pickle", "rb") as file:
+                    settings = pickle.load(file)
+                print("Disabling Game Validation will drastically decrease update times.\n"
+                      "However, doing this will also prevent games from performing\n"
+                      "integrity checks.\n")
+                try:
+                    print("CURRENT VALIDATION SETTING: {}\n".format(settings["validate"]))
+                except:
+                    print("CURRENT VALIDATION SETTING: True\n")
+                x = input("Are you sure: Y/N: ")
+                if x.upper() == "Y":
+                    tog = toggle_val()
+                    os.system("cls")
+                    print(banner)
+                    if tog == "RUN AGAIN":
+                        print("Please run this command again!\n"
+                              "You should only have to do this once!")
+                    elif tog == "DONE":
+                        print("Validation toggled!")
+                    input("")
+                else:
+                    pass
