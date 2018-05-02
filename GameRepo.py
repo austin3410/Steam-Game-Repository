@@ -12,7 +12,7 @@ banner = ("=========================\n"
                "= Steam Game Repository =\n"    
                "=========================")
 
-version = "V1.1.1"
+version = "V1.1.2"
 
 # Function Area
 def download_file(url):
@@ -646,6 +646,8 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                                         ins = ins.splitlines()
                                     for i in ins:
                                         os.system("{}".format(i))
+                                    os.system("rm {}.zip".format(new_version))
+                                    os.system("rmdir /Q /S update")
                                     print("Update complete! SGR will now restart!")
                                     input(" ")
                                     os.system("python GameRepo.py")
