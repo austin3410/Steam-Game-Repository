@@ -646,7 +646,7 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                                         ins = ins.splitlines()
                                     for i in ins:
                                         os.system("{}".format(i))
-                                    os.system("rm {}.zip".format(new_version))
+                                    os.system("del {}.zip".format(new_version))
                                     os.system("rmdir /Q /S update")
                                     print("Update complete! SGR will now restart!")
                                     input(" ")
