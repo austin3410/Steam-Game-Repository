@@ -4,8 +4,40 @@ import time
 import requests
 from bs4 import BeautifulSoup
 import fnmatch
+import zipfile
+
+# Global Variables
+
+banner = ("=========================\n"
+               "= Steam Game Repository =\n"    
+               "=========================")
+
+version = "V1.1.1"
 
 # Function Area
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    r = requests.get(url, stream=True)
+    with open(local_filename, "wb") as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+    return local_filename
+
+def unzip_file(file_name):
+    zip_ref = zipfile.ZipFile(file_name, "r")
+    zip_ref.extractall("update")
+    zip_ref.close()
+
+def get_next_dir(dir):
+    r = []
+    subdirs = [x[0] for x in os.walk(dir)]
+    for subdir in subdirs:
+        files = os.walk(subdir)
+        for file in files:
+            r.append(file)
+    return r[0][1][0]
+
 def edit_settings(master_dir, username, op):
     if op == "write":
         try:
@@ -130,14 +162,6 @@ def file_check():
         print("settings.pickle not found...")
         time.sleep(.5)
     return file_check.stage
-
-# Global Variables
-
-banner = ("=========================\n"
-               "= Steam Game Repository =\n"    
-               "=========================")
-
-version = "V1.1.0"
 
 # First time setup section
 # Crit File Check
@@ -607,9 +631,30 @@ if stage["main_script.txt"] == 1 and stage["settings.pickle"] == 1:
                             print("There is a newer version available!\n"
                                   "Your Version: {}\n"
                                   "Current Version: {}\n"
-                                  "Go to:\n"
-                                  "https://github.com/austin3410/Steam-Game-Repository/releases/latest\n"
-                                  "To download it.".format(version, new_version))
+                                  "Would you like to download and install it?\n".format(version, new_version))
+                            u = input("Y/N: ")
+                            if u.upper() == "Y":
+                                os.system("cls")
+                                print(banner)
+                                try:
+                                    durl = "https://github.com/austin3410/Steam-Game-Repository/archive/{}.zip".format(new_version)
+                                    file_name = download_file(durl)
+                                    unzip_file(file_name)
+                                    next_dir = get_next_dir("update")
+                                    with open("update//{}//settings//instructions.txt".format(next_dir), "r") as file:
+                                        ins = file.read()
+                                        ins = ins.splitlines()
+                                    for i in ins:
+                                        os.system("{}".format(i))
+                                    print("Update complete! SGR will now restart!")
+                                    input(" ")
+                                    os.system("python GameRepo.py")
+                                    quit()
+                                except:
+                                    print("Something went wrong!")
+                            else:
+                                pass
+
                 input(" ")
             elif z == "4":
                 os.system("cls")
